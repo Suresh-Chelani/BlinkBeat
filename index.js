@@ -10,20 +10,22 @@ const port = 5000;
 
 //* middleware
 app.use(express.json());
-const allowedOrigins = ["http://localhost:5173", "https://blinkedbeat.net"];
-
 app.use(
   cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true,
+    origin: ["https://blinkbeat.net", "http://localhost:5173"], // Allow both deployed & local frontend
+    credentials: true, // Allow cookies/auth headers
+    methods: ["GET", "POST", "PUT", "DELETE"], // Allowed HTTP methods
+    allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
   })
 );
+
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "https://blinkbeat.net");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", "true");
+  next();
+});
 
 //* Available routes
 app.use("/api/auth", auth);
